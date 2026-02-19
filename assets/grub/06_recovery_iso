@@ -1,0 +1,18 @@
+#!/bin/sh
+set -e
+
+RECOVERY_UUID="@RECOVERY_UUID@"
+
+if [ -z "$RECOVERY_UUID" ]; then
+  exit 0
+fi
+
+cat << EOF
+menuentry 'Ubuntu Recovery ISO' {
+  search --no-floppy --fs-uuid --set=root $RECOVERY_UUID
+  set isofile="/ubuntu-recovery.iso"
+  loopback loop (\$root)\$isofile
+  set iso_path="\$isofile"
+  configfile (loop)/boot/grub/loopback.cfg
+}
+EOF

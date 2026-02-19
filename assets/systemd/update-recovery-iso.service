@@ -1,0 +1,6 @@
+[Unit]
+Description=Update Ubuntu recovery ISO
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/update-recovery-iso

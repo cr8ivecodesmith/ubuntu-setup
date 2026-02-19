@@ -1,0 +1,32 @@
+# Local configuration overrides
+config/user.env
+config/user.env.*
+
+# Installer state and runtime artifacts
+state/
+recovery/
+**/install-logs/
+**/install-config/
+
+# Large disk images / ISOs
+*.iso
+*.iso.*
+*.img
+*.qcow2
+
+# Logs
+*.log
+
+# Editor / IDE noise
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python / virtualenvs (if used alongside scripts)
+.venv/
+venv/
+
+# Node / frontend deps (if added later)
+node_modules/

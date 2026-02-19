@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+CONF_FILE="/etc/ubuntu-recovery.conf"
+
+if [[ -f "$CONF_FILE" ]]; then
+  # shellcheck disable=SC1090
+  source "$CONF_FILE"
+fi
+
+if [[ -z "${RECOVERY_ISO_URL:-}" || -z "${RECOVERY_ISO_PATH:-}" ]]; then
+  echo "RECOVERY_ISO_URL and RECOVERY_ISO_PATH must be set in $CONF_FILE" >&2
+  exit 1
+fi
+
+FINAL_PATH="${RECOVERY_ISO_PATH}"
+FINAL_DIR="$(dirname "${FINAL_PATH}")"
+TMP_PATH="${FINAL_DIR}/.ubuntu-recovery.iso.new"
+BAK_PATH="${FINAL_PATH}.bak"
+
+mkdir -p "${FINAL_DIR}"
+
+echo "Downloading recovery ISO from ${RECOVERY_ISO_URL}"
+if ! curl -fL "${RECOVERY_ISO_URL}" -o "${TMP_PATH}"; then
+  echo "Download failed" >&2
+  exit 1
+fi
+
+if [[ -n "${RECOVERY_ISO_SHA256:-}" ]]; then
+  echo "Verifying checksum"
+  echo "${RECOVERY_ISO_SHA256}  ${TMP_PATH}" | sha256sum --check - || {
+    echo "Checksum verification failed" >&2
+    exit 1
+  }
+fi
+
+if [[ -f "${FINAL_PATH}" ]]; then
+  mv "${FINAL_PATH}" "${BAK_PATH}"
+fi
+mv "${TMP_PATH}" "${FINAL_PATH}"
+
+echo "Recovery ISO updated at ${FINAL_PATH}"
